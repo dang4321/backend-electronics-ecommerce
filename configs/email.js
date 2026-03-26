@@ -6,8 +6,8 @@ const BACKEND_URL = process.env.BACKEND_URL;
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // true cho port 465, false cho port 587
+  port: 465,           // SỬA: Đổi từ 587 sang 465
+  secure: true,        // SỬA: Đổi từ false sang true
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
