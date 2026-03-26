@@ -1,6 +1,9 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv/config';
 
+// Tự động lấy URL của Backend từ biến môi trường, hoặc dùng link Render của bạn
+const BACKEND_URL = process.env.BACKEND_URL;
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
@@ -13,7 +16,8 @@ const transporter = nodemailer.createTransport({
 
 const sendVerificationEmail = async (email, verificationToken) => {
   try {
-    const verificationUrl = `http://localhost:3000/api/v1/verifyemail?token=${verificationToken}`;
+    // Sửa localhost thành BACKEND_URL
+    const verificationUrl = `${BACKEND_URL}/api/v1/verifyemail?token=${verificationToken}`;
     const mailOptions = {
       from: `"ESHOP" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -100,10 +104,10 @@ const sendZaloPayConfirmationEmail = async (email, orderId, userName, totalPrice
 };
 
 // đổi mât khẩu
-// email.js (already correct, just for reference)
 const sendPasswordResetEmail = async (email, resetToken) => {
   try {
-    const resetUrl = `http://localhost:3000/api/v1/reset-password?token=${resetToken}`;
+    // Sửa localhost thành BACKEND_URL
+    const resetUrl = `${BACKEND_URL}/api/v1/reset-password?token=${resetToken}`;
     const mailOptions = {
       from: `"ESHOP" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -124,7 +128,5 @@ const sendPasswordResetEmail = async (email, resetToken) => {
     throw error;
   }
 };
-
-
 
 export { sendVerificationEmail, sendOrderConfirmationEmail, sendZaloPayConfirmationEmail, sendPasswordResetEmail };

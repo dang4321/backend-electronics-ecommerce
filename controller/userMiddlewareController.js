@@ -46,7 +46,15 @@ const userLoginAPI = async (req, res) => {
       const refreshToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }); // Refresh token sống 7 ngày
   
       // Gửi cả access token và refresh token về client
-      res.cookie('jwt', refreshToken, { httpOnly: true, path: '/', maxAge: 7 * 24 * 60 * 60 * 1000 }); // lưu refresh token trong cookie
+      const isProd = process.env.NODE_ENV === 'production';
+      res.cookie('jwt', refreshToken, { 
+          httpOnly: true, 
+          path: '/', 
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          secure: isProd, // Tự động true trên Render
+          sameSite: isProd ? 'none' : 'lax' // Cho phép gửi chéo tên miền Vercel -> Render
+      }); // lưu refresh token trong cookie
+      
       return res.status(200).json({ accessToken });
     } catch (error) {
       console.error(error);
@@ -162,7 +170,14 @@ const getAccountAPI = (req, res) => {
 
 //đăng xuất
 const userLogoutAPI = (req, res) => {
-    res.clearCookie('jwt', {path: "/", httpOnly: true}); // Xóa cookie chứa token
+    const isProd = process.env.NODE_ENV === 'production';
+    res.clearCookie('jwt', {
+        path: "/", 
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? 'none' : 'lax'
+    }); // Xóa cookie chứa token với cấu hình chuẩn
+    
     return res.status(200).json({
         errCode: 1,
         message: "Đăng xuất thành công.",
@@ -281,12 +296,13 @@ const addGoogleUserAPI = async (req, res) => {
     const refreshToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     // Thiết lập cookie jwt
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('jwt', refreshToken, {
       httpOnly: true,
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax', // Đã sửa strict thành none
     });
 
     // Tạo access token
